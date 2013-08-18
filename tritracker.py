@@ -3,7 +3,7 @@
 
 from os import environ
 from bottle import get, post
-from bottle import request, template
+from bottle import request, template, view
 from bottle import run as startBottle
 from pymongo import MongoClient
 from datetime import datetime
@@ -20,13 +20,21 @@ database = client[db]
 database.authenticate(user, passw)
 records = database.records
 
-def round_to_day(time, leeway=5):
+def round_to_date(time, leeway=5):
 	if time.hour > leeway: return datetime(time.year, time.month, time.day)
 	else: return datetime(time.year, time.month, time.day - 1)
 
+def days_since_last_entry():
+	last = records.find().sort('date', -1).limit(1)
+	diff = datetime.now() - last[0]['date']
+	return diff.days
+
 @get('/')
+@view('create_record')
 def index():
-	return template('create_record');
+	return {
+		'days_since_last_entry' : days_since_last_entry()
+	}
 
 @post('/record')
 def create_record():
@@ -34,7 +42,7 @@ def create_record():
 		'time'     : request.forms.get('time'),
 		'distance' : request.forms.get('distance'),
 		'type'     : request.forms.get('type'),
-		'date'     : round_to_day(datetime.today()),
+		'date'     : round_to_date(datetime.today()),
 		'entry'    : datetime.today()
 	}
 	records.insert(record)
