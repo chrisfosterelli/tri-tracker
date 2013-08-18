@@ -20,6 +20,10 @@ database = client[db]
 database.authenticate(user, passw)
 records = database.records
 
+def round_to_day(time, leeway=5):
+	if time.hour > leeway: return datetime(time.year, time.month, time.day)
+	else: return datetime(time.year, time.month, time.day - 1)
+
 @get('/')
 def index():
 	return template('create_record');
@@ -30,7 +34,8 @@ def create_record():
 		'time'     : request.forms.get('time'),
 		'distance' : request.forms.get('distance'),
 		'type'     : request.forms.get('type'),
-		'date'     : datetime.today()
+		'date'     : round_to_day(datetime.today()),
+		'entry'    : datetime.today()
 	}
 	records.insert(record)
 	return 'ok'
