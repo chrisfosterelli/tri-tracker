@@ -2,6 +2,7 @@
 # Christopher Foster
 
 from os import environ
+from bottle import redirect
 from bottle import static_file
 from bottle import get, post, route
 from bottle import request, template, view
@@ -47,7 +48,7 @@ def create_record():
 		'entry'    : datetime.today()
 	}
 	records.insert(record)
-	return 'ok'
+	redirect('/')
 
 @route('/static/<filename>')
 def server_static(filename):
