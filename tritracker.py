@@ -2,7 +2,8 @@
 # Christopher Foster
 
 from os import environ
-from bottle import get, post
+from bottle import static_file
+from bottle import get, post, route
 from bottle import request, template, view
 from bottle import run as startBottle
 from pymongo import MongoClient
@@ -47,5 +48,9 @@ def create_record():
 	}
 	records.insert(record)
 	return 'ok'
+
+@route('/static/<filename>')
+def server_static(filename):
+	return static_file(filename, root='static')
 
 startBottle(host='0.0.0.0', port=8080)

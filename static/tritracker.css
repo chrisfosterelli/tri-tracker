@@ -1,0 +1,39 @@
+
+/* Base styling */
+
+body, p {
+  background-color: #3276B1;
+}
+
+p, input, select {
+  text-align: center;
+}
+
+input, select {
+  font-size: 20px !important;
+}
+
+p {
+  margin: 0;
+}
+
+/* Custom style elements */
+
+.block {
+  width: 100%;
+  height: 60px !important;
+}
+
+p.block {
+  line-height: 60px;
+}
+
+/* Override bootstrap styles */
+
+.btn {
+  border-radius: 0px !important;
+}
+
+.form-control {
+  border-radius: 0px !important;
+}
