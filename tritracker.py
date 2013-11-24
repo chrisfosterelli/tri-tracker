@@ -27,7 +27,7 @@ def round_to_date(time, leeway=5):
 	else: return datetime(time.year, time.month, time.day - 1)
 
 def days_since_last_entry():
-	last = records.find().sort('date', -1).limit(1)
+	last = records.find(timeout=False).sort('date', -1).limit(1)
 	diff = datetime.now() - last[0]['date']
 	return diff.days
 
