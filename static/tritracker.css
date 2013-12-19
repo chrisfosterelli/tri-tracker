@@ -24,8 +24,18 @@ p {
   height: 60px !important;
 }
 
+h3.block {
+  margin: 0;
+  padding: 15px 0;
+  text-align: center;
+}
+
 p.block {
   line-height: 60px;
+}
+
+.block.white {
+  background-color: white;
 }
 
 /* Override bootstrap styles */
