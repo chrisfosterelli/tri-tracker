@@ -51,13 +51,13 @@ def days_since_last_entry():
 	return diff.days
 
 def get_previous_entry(record):
-	return records.find_one({
+	return records.find({
 		'type'     : record['type'],
 		'distance' : record['distance'],
 		'date'     : {
-			'$lte' : record['date']
+			'$lt' : record['date']
 		}
-	})
+	}).sort('date', -1).limit(1)[0]
 
 @get('/')
 @view('create_record')
