@@ -7,7 +7,13 @@
   <link rel="stylesheet" href="/static/tritracker.css" />
  </head>
  <body>
-  <p class="block">
+  %if days_since_last_entry < 2:
+  <p class="block green">
+  %elif days_since_last_entry == 2:
+  <p class="block yellow">
+  %else:
+  <p class="block red">
+  %end
     %if days_since_last_entry:
     The last time you trained was {{days_since_last_entry}} days ago.
     %else:

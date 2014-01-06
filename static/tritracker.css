@@ -38,6 +38,18 @@ p.block {
   background-color: white;
 }
 
+.block.green {
+  background-color: green;
+}
+
+.block.red {
+  background-color: red;
+}
+
+.block.yellow {
+  background-color: yellow;
+}
+
 /* Override bootstrap styles */
 
 .btn {
