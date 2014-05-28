@@ -10,6 +10,11 @@
   <h3 class="block">
     Exercise View
   </h3>
+  %if best['percentage'] >= 0:
+  <h3 class="block green">
+    New Record
+  </h3>
+  %end
   <p class="block white">
     Exercised at a pace of {{'%.2f' % pace}} min/km
   </p>
@@ -17,17 +22,17 @@
     Previous
   </h3>
   <p class="block white">
-    %if percentage >= 0:
-    {{'%.2f' % percentage}}% faster
+    %if previous['percentage'] >= 0:
+    {{'%.2f' % previous['percentage']}}% faster
     %else:
-    {{'%.2f' % percentage}}% slower
+    {{'%.2f' % previous['percentage']}}% slower
     %end
   </p>
   <p class="block white">
-    %if seconds >= 0:
-    {{'%.1f' % seconds}} seconds faster
+    %if previous['seconds'] >= 0:
+    {{'%.1f' % previous['seconds']}} seconds faster
     %else:
-    {{'%.1f' % seconds}} seconds slower
+    {{'%.1f' % previous['seconds']}} seconds slower
     %end
   </p>
   <h3 class="block">
@@ -38,6 +43,23 @@
   </p>
   <p class="block white">
     -
+  </p>
+  <h3 class="block">
+    Previous Best
+  </h3>
+  <p class="block white">
+    %if best['percentage'] >= 0:
+    {{'%.2f' % best['percentage']}}% faster
+    %else:
+    {{'%.2f' % best['percentage']}}% slower
+    %end
+  </p>
+  <p class="block white">
+    %if best['seconds'] >= 0:
+    {{'%.1f' % best['seconds']}} seconds faster
+    %else:
+    {{'%.1f' % best['seconds']}} seconds slower
+    %end
   </p>
   <h3 class="block">
     Information
