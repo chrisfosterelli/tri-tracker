@@ -36,13 +36,21 @@
     %end
   </p>
   <h3 class="block">
-    Average
+    Three Month Average
   </h3>
   <p class="block white">
-    -
+    %if average['percentage'] >= 0:
+    {{'%.2f' % average['percentage']}}% faster
+    %else:
+    {{'%.2f' % average['percentage']}}% slower
+    %end
   </p>
   <p class="block white">
-    -
+    %if average['seconds'] >= 0:
+    {{'%.1f' % average['seconds']}} seconds faster
+    %else:
+    {{'%.1f' % average['seconds']}} seconds slower
+    %end
   </p>
   <h3 class="block">
     Previous Best

@@ -10,6 +10,7 @@ from bottle import run as startBottle
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
+from datetime import timedelta
 
 port  = int(environ['mongo_port'])
 host  = environ['mongo_host']
@@ -32,6 +33,9 @@ def get_seconds(time_string):
     split = time_string.split(':')
     return float(split[0]) * 60 + float(split[1]) * 1
 
+def get_timestring(seconds):
+    return '%d:%02d' % (seconds / 60, seconds % 60)
+
 def get_entry_comparison(record1, record2):
     time1 = get_seconds(record1['time'])
     if record2: time2 = get_seconds(record2['time'])
@@ -40,6 +44,9 @@ def get_entry_comparison(record1, record2):
         'percentage' : (100 - ((time1 / time2) * 100)),
         'seconds'    : (time2 - time1)
     }
+
+def get_three_months_ago(date):
+    return date - timedelta(days=3*30) 
 
 def round_to_date(time, leeway=5):
     if time.hour > leeway: return datetime(time.year, time.month, time.day)
@@ -66,10 +73,32 @@ def get_best_entry(record):
         'date'     : {
             '$lt' : record['date']
         },
-        '_id'      : {
+        '_id' : {
             '$ne' : record['_id']
         }
     }).sort('time', 1).limit(1)[0]
+
+def create_average_entry(record):
+    record_set = records.find({
+        'type'     : record['type'],
+        'distance' : record['distance'],
+        'date'     : {
+            '$lt' : record['date'],
+            '$gt' : get_three_months_ago(record['date'])
+        },
+        '_id' : {
+            '$ne' : record['_id']
+        }
+    })
+    total_time = 0
+    for record in record_set:
+        total_time += get_seconds(record['time'])
+    return {
+        'type'     : record['type'],
+        'distance' : record['distance'],
+        'time'     : get_timestring(total_time / record_set.count())
+    }
+    
 
 @get('/')
 @view('create_record')
@@ -95,8 +124,10 @@ def create_record():
 def display_record(record):
     item = records.find_one(ObjectId(record))
     last = get_previous_entry(item)
+    avrg = create_average_entry(item)
     best = get_best_entry(item)
     last_dif = get_entry_comparison(item, last)
+    avrg_dif = get_entry_comparison(item, avrg)
     best_dif = get_entry_comparison(item, best)
     pace = calculate_pace(item['time'], item['distance'])
     return {
@@ -108,6 +139,10 @@ def display_record(record):
         'previous' : {
             'percentage' : last_dif['percentage'],
             'seconds'    : last_dif['seconds']
+        },
+        'average' : {
+            'percentage' : avrg_dif['percentage'],
+            'seconds'    : avrg_dif['seconds']
         },
         'best' : {
             'percentage' : best_dif['percentage'],
