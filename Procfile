@@ -1,1 +1,1 @@
-web: tritracker.py
+web: ./tritracker.py
