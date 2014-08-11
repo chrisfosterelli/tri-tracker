@@ -154,4 +154,4 @@ def display_record(record):
 def server_static(filename):
     return static_file(filename, root='static')
 
-startBottle(host='0.0.0.0', port=8080)
+startBottle(host='0.0.0.0', port=environ.get('PORT', 8080))
