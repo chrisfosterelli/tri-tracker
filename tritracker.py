@@ -3,20 +3,22 @@
 
 from os import environ
 from bottle import redirect
+from bottle import auth_basic
 from bottle import static_file
-from bottle import get, post, route
-from bottle import request, template, view
+from bottle import template, view
+from bottle import request, response
+from bottle import get, post, route, error
 from bottle import run as startBottle
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
 from datetime import timedelta
 
-port  = int(environ['mongo_port'])
-host  = environ['mongo_host']
-db    = environ['mongo_db']
-user  = environ['mongo_user']
-passw = environ['mongo_pass']
+port  = int(environ['MONGO_PORT'])
+host  = environ['MONGO_HOST']
+db    = environ['MONGO_DB']
+user  = environ['MONGO_USER']
+passw = environ['MONGO_PASS']
 
 client   = MongoClient(host, port)
 database = client[db]
@@ -98,16 +100,23 @@ def create_average_entry(record):
         'distance' : record['distance'],
         'time'     : get_timestring(total_time / record_set.count())
     }
+
+def ensure_auth(user, pas):
+    if user != environ.get('AUTH_USER', 'TEST'): return False
+    if pas != environ.get('AUTH_PASS', 'TEST'): return False
+    return True
     
 
 @get('/')
 @view('create_record')
+@auth_basic(ensure_auth)
 def index():
     return {
         'days_since_last_entry' : days_since_last_entry()
     }
 
 @post('/record')
+@auth_basic(ensure_auth)
 def create_record():
     record = {
         'time'     : request.forms.get('time'),
@@ -121,6 +130,7 @@ def create_record():
 
 @get('/record/<record>')
 @view('display_record')
+@auth_basic(ensure_auth)
 def display_record(record):
     item = records.find_one(ObjectId(record))
     last = get_previous_entry(item)
@@ -151,7 +161,13 @@ def display_record(record):
     }
 
 @route('/static/<filename>')
+@auth_basic(ensure_auth)
 def server_static(filename):
     return static_file(filename, root='static')
+
+@error(401)
+def error401(error):
+    response.headers['WWW-Authenticate'] = 'Basic realm="Login required"' 
+    return 'You must authenticate'
 
 startBottle(host='0.0.0.0', port=environ.get('PORT', 8080))
